@@ -12,23 +12,24 @@ def main():
 
     mongodb = MongoDB()
     with sync_playwright() as p:
-        for each in (p.webkit, p.firefox, p.chromium):
-            try:
-                send_message("Launching browser...", log=True)
-                browser = each.launch(headless=False)
+        while True:
+            for each in (p.webkit, p.firefox, p.chromium):
+                try:
+                    send_message("Launching browser...", log=True)
+                    browser = each.launch(headless=False)
 
-                costco_main(browser, mongodb)
+                    costco_main(browser, mongodb)
 
-                browser.close()
+                    browser.close()
 
-                send_message(f"Sleeping for {SLEEP_INTERVAL} seconds...", log=True)
-                time.sleep(SLEEP_INTERVAL)
-            except PlaywrightTimeoutError:
-                send_message("Playwright times out", log=True)
-            except PlaywrightError:
-                send_message("Playwright error", log=True)
-            except Exception as e:
-                send_message(f"Unknown error {e}", log=True)
+                    send_message(f"Sleeping for {SLEEP_INTERVAL} seconds...", log=True)
+                    time.sleep(SLEEP_INTERVAL)
+                except PlaywrightTimeoutError:
+                    send_message("Playwright times out", log=True)
+                except PlaywrightError:
+                    send_message("Playwright error", log=True)
+                except Exception as e:
+                    send_message(f"Unknown error {e}", log=True)
 
 
 if __name__ == '__main__':
