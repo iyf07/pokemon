@@ -1,11 +1,12 @@
 import requests
 import os
 
-def form_message(item, item_url, in_stock, store):
+def form_message(item, in_stock, current_price=None):
     message_list = [
-        "🐣上货了！" if in_stock else "🥚缺货了！",
-        f"{item} @{store}",
-        item_url
+        "🐣呆呆鸭发车！" if in_stock else "🥚呆呆鸭下车！",
+        f"{item['store']}: {item['alias']} @${current_price}" if current_price else f"{item['store']}: {item['alias']}",
+        f"限价: ${item['price']}",
+        item['url']
     ]
     return "\n".join(message_list)
 

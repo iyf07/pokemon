@@ -1,27 +1,32 @@
 from pymongo import MongoClient
 from datetime import datetime
-from config import MONGODB_PROJECT, MONGODB_ITEMS_CLUSTER, MONGODB_ITEMS_TEST_CLUSTER
 import os
 
 class MongoDB():
     def __init__(self):
         self.connect_mongodb()
 
-    def connect_mongodb(self):
+    def connect_mongodb(self):    
+        mongodb_project = 'pokemon'
+        mongodb_items_cluster = 'items'
         uri = os.environ.get("MONGODB_URI")
-        prod = os.environ.get("PRODUCTION") == "true"
         client = MongoClient(uri)
-        db = client[MONGODB_PROJECT]
-        collection = db[MONGODB_ITEMS_CLUSTER] if prod else db[MONGODB_ITEMS_TEST_CLUSTER]
-        self.collection = collection
+        db = client[mongodb_project]
+        self.collection = db[mongodb_items_cluster]
 
-    def check_in_stock(self, url):
-        item_info = self.collection.find_one(
+    def find_items_by_store(self, store):
+        items = self.collection.find({"store": store})
+        return items
+    
+    def find_item_in_stock(self, url):
+        item = self.collection.find_one({"url": url})
+        return item["in_stock"]
+    
+    def update_item_in_stock(self, url, in_stock):
+        self.collection.update_one(
             {"url": url},
-            {"in_stock": 1}
+            {"$set": {"in_stock": in_stock}}
         )
-        in_stock = item_info["in_stock"] if item_info else None
-        return in_stock
 
     def find_out_of_stock_items(self, in_stock_item_urls):
         res = self.collection.find(
